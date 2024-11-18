@@ -7,6 +7,8 @@ import RecoverPasswordScreen from "./screens/RecoverPassword";
 import Home from "./screens/Home"; // Pantalla del Menú Principal
 import WorkersList from "./screens/WorkersList"; // Lista de Trabajadores
 import WorkerDetails from "./screens/WorkerDetails"; // Detalles del Trabajador
+import AddWorker from "./screens/AddWorker";
+
 
 const Stack = createStackNavigator();
 
@@ -48,6 +50,11 @@ const StackNavigator = () => {
         name="WorkersList"
         component={WorkersList}
         options={{ title: "Gestión de Trabajadores" }}
+      />
+      <Stack.Screen
+        name="AddWorker"
+        component={AddWorker}
+        options={{ title: "Agregar Trabajador" }}
       />
       {/* Detalles del Trabajador */}
       <Stack.Screen
