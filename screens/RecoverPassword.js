@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Alert,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
@@ -13,16 +14,12 @@ import {
 
 const { width, height } = Dimensions.get("window");
 
-const LoginScreen = ({ navigation }) => {
+const RecoverPasswordScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    navigation.navigate("Home"); // Navegar al menú principal
-  };
-
-  const handleForgotPassword = () => {
-    navigation.navigate("RecoverPassword"); // Navegar a la pantalla de recuperación
+  const handleRecoverPassword = () => {
+    Alert.alert("Recuperación", "Funcionalidad aún no implementada.");
+    navigation.navigate("LogIn"); // Navegar de regreso al login
   };
 
   return (
@@ -31,9 +28,8 @@ const LoginScreen = ({ navigation }) => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Iniciar Sesión</Text>
+        <Text style={styles.title}>Recuperar Contraseña</Text>
 
-        {/* Campos de Entrada */}
         <TextInput
           placeholder="Correo Electrónico"
           value={email}
@@ -41,22 +37,16 @@ const LoginScreen = ({ navigation }) => {
           keyboardType="email-address"
           style={styles.input}
         />
-        <TextInput
-          placeholder="Contraseña"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-        />
 
-        {/* Botón de Iniciar Sesión */}
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        <TouchableOpacity style={styles.button} onPress={handleRecoverPassword}>
+          <Text style={styles.buttonText}>Enviar Enlace</Text>
         </TouchableOpacity>
 
-        {/* Enlace para recuperar contraseña */}
-        <TouchableOpacity onPress={handleForgotPassword}>
-          <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.cancelButtonText}>Cancelar</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -100,11 +90,18 @@ const styles = StyleSheet.create({
     fontSize: width * 0.045,
     fontWeight: "bold",
   },
-  forgotPasswordText: {
-    color: "#3498db",
-    fontSize: width * 0.04,
-    marginTop: height * 0.01,
+  cancelButton: {
+    width: "100%",
+    paddingVertical: height * 0.02,
+    backgroundColor: "#e74c3c",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    color: "#fff",
+    fontSize: width * 0.045,
+    fontWeight: "bold",
   },
 });
 
-export default LoginScreen;
+export default RecoverPasswordScreen;
