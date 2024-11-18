@@ -47,22 +47,28 @@ QR-Control Agrícola es una aplicación móvil híbrida diseñada para automatiz
 - **Backend:** Firebase (Base de datos NoSQL y autenticación).
 - **Notificaciones Push:** Firebase Cloud Messaging.
 - **Gestión de Estado:** Hooks, otros componentes y props reutilizables.
+  
 - **Dependencias:**
+
   NAVEGACIÓN:
 -   yarn add @react-navigation/native react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-vector-icons
 -   yarn add @react-navigation/stack
 -   yarn add @react-navigation/drawer
 
   CÁMARA Y SELECTOR DE IMAGENES:
+  
 -   yarn add expo-camera expo-image-picker
 
 ANIMACIONES:
+
 -   yarn add react-native-reanimated
 
 BARRA DE ESTADO:
+
 -   yarn add expo-status-bar
 
 GENERAL:
+
 yarn add @react-navigation/drawer react-native-gesture-handler react-native-reanimated react-native-screens react-native-safe-area-context react-native-vector-icons
   - `@react-navigation/native`
   - `@react-navigation/stack`
