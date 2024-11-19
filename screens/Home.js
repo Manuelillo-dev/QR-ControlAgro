@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+} from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -7,6 +13,12 @@ const Home = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Menú</Text>
+      <TouchableOpacity
+        style={styles.menuButton}
+        onPress={() => navigation.navigate("ScanQRCode")}
+      >
+        <Text style={styles.menuButtonText}>Pase de lista (QR)</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.menuButton}
@@ -29,7 +41,10 @@ const Home = ({ navigation }) => {
         <Text style={styles.menuText}>Gestión de Reportes</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={() => navigation.navigate("LogIn")}>
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() => navigation.navigate("LogIn")}
+      >
         <Text style={styles.logoutText}>Cerrar sesión</Text>
       </TouchableOpacity>
     </View>

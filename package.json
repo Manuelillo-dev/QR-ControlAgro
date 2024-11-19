@@ -17,6 +17,7 @@
     "blur": "^1.0.5",
     "dependencies": "^0.0.1",
     "expo": "^52.0.7",
+    "expo-barcode-scanner": "^13.0.1",
     "expo-blur": "~14.0.1",
     "expo-camera": "^16.0.5",
     "expo-image-picker": "^16.0.2",
@@ -28,6 +29,7 @@
     "react-native-reanimated": "^3.16.1",
     "react-native-safe-area-context": "^4.14.0",
     "react-native-screens": "^4.1.0",
+    "react-native-svg": "^15.9.0",
     "react-native-web": "~0.19.13"
   },
   "devDependencies": {
