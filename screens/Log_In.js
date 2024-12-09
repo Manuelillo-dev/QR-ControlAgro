@@ -10,19 +10,62 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
-  const handleLogin = () => {
-    navigation.navigate("Home"); // Navegar al menú principal
+  const handleLogin = async () => {
+    if (!isValidEmail(email)) {
+      setError("Por favor ingrese un correo electrónico válido.");
+      return;
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const user = userCredential.user;
+      console.log("Usuario iniciado sesión:", user.email);
+
+      const usersCollectionRef = collection(FIRESTORE_DB, "users");
+      const q = query(usersCollectionRef, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        await addDoc(usersCollectionRef, { email: user.email });
+        console.log("Usuario creado en Firestore");
+      } else {
+        console.log("El usuario ya existe en Firestore");
+      }
+
+      navigation.navigate("Home");
+    } catch (error) {
+      console.error("Error de inicio de sesión:", error);
+      switch (error.code) {
+        case "auth/invalid-email":
+          setError("Correo electrónico inválido");
+          break;
+        case "auth/wrong-password":
+          setError("Contraseña incorrecta");
+          break;
+        case "auth/user-not-found":
+          setError("El usuario no está registrado");
+          break;
+        default:
+          setError("Error de inicio de sesión");
+          break;
+      }
+    }
   };
 
-  const handleForgotPassword = () => {
-    navigation.navigate("RecoverPassword"); // Navegar a la pantalla de recuperación
+  const isValidEmail = (email) => {
+    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return re.test(email);
   };
 
   return (
@@ -32,8 +75,7 @@ const LoginScreen = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Iniciar Sesión</Text>
-
-        {/* Campos de Entrada */}
+        {error && <Text style={styles.errorText}>{error}</Text>}
         <TextInput
           placeholder="Correo Electrónico"
           value={email}
@@ -48,14 +90,10 @@ const LoginScreen = ({ navigation }) => {
           secureTextEntry
           style={styles.input}
         />
-
-        {/* Botón de Iniciar Sesión */}
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Iniciar Sesión</Text>
         </TouchableOpacity>
-
-        {/* Enlace para recuperar contraseña */}
-        <TouchableOpacity onPress={handleForgotPassword}>
+        <TouchableOpacity onPress={() => navigation.navigate("RecoverPassword")}>
           <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -76,6 +114,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
     marginBottom: height * 0.02,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
   },
   input: {
     width: "100%",
@@ -102,8 +144,7 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     color: "#3498db",
-    fontSize: width * 0.04,
-    marginTop: height * 0.01,
+    marginTop: 10,
   },
 });
 

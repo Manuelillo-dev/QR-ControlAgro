@@ -5,139 +5,87 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
   Dimensions,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
+import { FIREBASE_AUTH, FIRESTORE_DB } from "../firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
 const RegistroUsuario = ({ navigation }) => {
-  const [formData, setFormData] = useState({
-    nombre1: "",
-    nombre2: "",
-    apellido1: "",
-    apellido2: "",
-    telefono: "",
-    email: "",
-    contraseña: "",
-    fechaNacimiento: "",
-    curp: "",
-    rol: "Administrador", // Por defecto administrador
-    actaNacimiento: null,
-    credencialElector: null,
-    comprobanteDomicilio: null,
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
-  const handleInputChange = (field, value) => {
-    setFormData({
-      ...formData,
-      [field]: value,
-    });
+  // Función para validar el correo electrónico
+  const isValidEmail = (email) => {
+    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return re.test(email);
   };
 
-  const handleSelectFile = (field) => {
-    alert(`Seleccionar archivo para: ${field}`);
+  const handleRegistro = async () => {
+    // Validar el formato del correo
+    if (!isValidEmail(email)) {
+      setError("Por favor ingrese un correo electrónico válido.");
+      return;
+    }
+
+    try {
+      // Crea un nuevo usuario en Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const user = userCredential.user;
+      console.log("Usuario registrado:", user.email);
+
+      // Guarda el usuario en Firestore
+      const usersCollectionRef = collection(FIRESTORE_DB, "users");
+      await addDoc(usersCollectionRef, {
+        email: user.email,
+      });
+
+      console.log("Usuario guardado en Firestore");
+      navigation.navigate("Home");
+
+    } catch (error) {
+      console.error("Error de registro:", error);
+      setError(error.message);
+    }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Registro de Usuario</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Registrar Usuario</Text>
 
-      {/* Campos de texto */}
-      <TextInput
-        placeholder="Primer Nombre"
-        value={formData.nombre1}
-        onChangeText={(value) => handleInputChange("nombre1", value)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Segundo Nombre (Opcional)"
-        value={formData.nombre2}
-        onChangeText={(value) => handleInputChange("nombre2", value)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Primer Apellido"
-        value={formData.apellido1}
-        onChangeText={(value) => handleInputChange("apellido1", value)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Segundo Apellido (Opcional)"
-        value={formData.apellido2}
-        onChangeText={(value) => handleInputChange("apellido2", value)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Teléfono"
-        value={formData.telefono}
-        onChangeText={(value) => handleInputChange("telefono", value)}
-        keyboardType="phone-pad"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Correo Electrónico"
-        value={formData.email}
-        onChangeText={(value) => handleInputChange("email", value)}
-        keyboardType="email-address"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Contraseña"
-        value={formData.contraseña}
-        onChangeText={(value) => handleInputChange("contraseña", value)}
-        secureTextEntry
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Fecha de Nacimiento (DD/MM/AAAA)"
-        value={formData.fechaNacimiento}
-        onChangeText={(value) => handleInputChange("fechaNacimiento", value)}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="CURP"
-        value={formData.curp}
-        onChangeText={(value) => handleInputChange("curp", value)}
-        style={styles.input}
-      />
+        {/* Mostrar el mensaje de error si existe */}
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {/* Documentos */}
-      <Text style={styles.sectionTitle}>Documentos</Text>
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() => handleSelectFile("Acta de Nacimiento")}
-      >
-        <Text style={styles.uploadButtonText}>Subir Acta de Nacimiento</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() => handleSelectFile("CURP")}
-      >
-        <Text style={styles.uploadButtonText}>Subir CURP</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() => handleSelectFile("Credencial de Elector")}
-      >
-        <Text style={styles.uploadButtonText}>Subir Credencial de Elector</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.uploadButton}
-        onPress={() => handleSelectFile("Comprobante de Domicilio")}
-      >
-        <Text style={styles.uploadButtonText}>Subir Comprobante de Domicilio</Text>
-      </TouchableOpacity>
+        <TextInput
+          placeholder="Correo Electrónico"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Contraseña"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+        />
 
-      {/* Botones de acción */}
-      <TouchableOpacity style={styles.button} onPress={() => alert("Registro enviado")}>
-        <Text style={styles.buttonText}>Registrar</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
-        <Text style={styles.cancelButtonText}>Cancelar</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <TouchableOpacity style={styles.button} onPress={handleRegistro}>
+          <Text style={styles.buttonText}>Registrar</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -146,14 +94,18 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f4f4",
     padding: width * 0.05,
+    backgroundColor: "#f4f4f4",
   },
   title: {
     fontSize: width * 0.06,
     fontWeight: "bold",
     color: "#333",
     marginBottom: height * 0.02,
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
   },
   input: {
     width: "100%",
@@ -165,25 +117,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginBottom: height * 0.02,
   },
-  sectionTitle: {
-    fontSize: width * 0.05,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: height * 0.01,
-  },
-  uploadButton: {
-    width: "100%",
-    paddingVertical: height * 0.02,
-    backgroundColor: "#3498db",
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: height * 0.02,
-  },
-  uploadButtonText: {
-    color: "#fff",
-    fontSize: width * 0.045,
-    fontWeight: "bold",
-  },
   button: {
     width: "100%",
     paddingVertical: height * 0.02,
@@ -193,18 +126,6 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   buttonText: {
-    color: "#fff",
-    fontSize: width * 0.045,
-    fontWeight: "bold",
-  },
-  cancelButton: {
-    width: "100%",
-    paddingVertical: height * 0.02,
-    backgroundColor: "#e74c3c",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  cancelButtonText: {
     color: "#fff",
     fontSize: width * 0.045,
     fontWeight: "bold",
